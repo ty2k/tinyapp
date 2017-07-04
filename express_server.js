@@ -42,7 +42,8 @@ app.post("/urls", (req, res) => {
   let newRandomString = generateRandomString();
   urlDatabase[newRandomString] = fullURL;
   console.log(urlDatabase);
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  // Respond with a redirect to /urls/newRandomString
+  res.redirect('/urls/' + newRandomString);
 });
 
 app.listen(PORT, () => {

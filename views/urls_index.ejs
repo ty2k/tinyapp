@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp: URLs Index</title>
+</head>
+<body>
+  <ul>
+    <% for(var key in urls) { %>
+      <li><%= key + ': ' + urls[key] %></li>
+    <% } %>
+      <li>
+        <a href="#">Shorten a new URL</a>
+      </li>
+  </ul>
+</body>
+</html>

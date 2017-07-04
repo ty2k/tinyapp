@@ -38,6 +38,10 @@ app.get("/urls/:id", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // debug statement to see POST parameters
+  let fullURL = req.body.longURL;
+  let newRandomString = generateRandomString();
+  urlDatabase[newRandomString] = fullURL;
+  console.log(urlDatabase);
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 

@@ -4,6 +4,7 @@
   <title>TinyApp: URLs Index</title>
 </head>
 <body>
+  <% include partials/_header.ejs %>
   <ul>
     <% for(var key in urls) { %>
       <li><%= key + ': ' + urls[key] %></li>

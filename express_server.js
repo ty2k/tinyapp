@@ -1,3 +1,5 @@
+"use strict";
+
 var express = require("express");
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
@@ -35,7 +37,6 @@ app.get("/urls/:id", (req, res) => {
   };
   res.render("urls_show", templateVars);
 });
-
 app.post("/urls", (req, res) => {
   console.log(req.body);  // debug statement to see POST parameters
   let fullURL = req.body.longURL;
@@ -44,6 +45,11 @@ app.post("/urls", (req, res) => {
   console.log(urlDatabase);
   // Respond with a redirect to /urls/newRandomString
   res.redirect('/urls/' + newRandomString);
+});
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL];
+  // Respond with a redirection to longURL
+  res.redirect(longURL);
 });
 
 app.listen(PORT, () => {

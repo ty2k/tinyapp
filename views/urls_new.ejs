@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>TinyApp: Shorten a URL</title>
+    <title>TinyApp: Shorten a New URL</title>
   </head>
   <body>
     <% include partials/_header %>
+    <h2>Shorten a New URL</h2>
     <form action="/urls" method="POST">
       <label for="longURL">Enter a URL:</label>
       <input id="longURL" type="text" name="longURL" placeholder="http://">

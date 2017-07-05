@@ -60,9 +60,11 @@ app.post("/urls", (req, res) => {
 });
 // POST route for logging in and becoming cookied
 app.post("/login", (req, res) => {
+  // Set a cookie with Express's built in res.cookie
   res.cookie("name", req.body.username);
   console.log("Our user submitted req.body.username: " + req.body.username);
   console.log("This cookie is associated with req.cookies: " + req.cookies.name);
+  // After logging in, redirect to /urls
   res.redirect("/urls");
 });
 // POST route for deleting existing shortened URLs

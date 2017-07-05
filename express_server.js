@@ -18,6 +18,12 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// Pass our logged in user's username from their cookie to the the templates
+/*let templateVars = {
+  username: req.cookies["username"],
+};
+res.render("urls_index", templateVars);*/
+
 // Hello at root
 app.get("/", (req, res) => {
   res.end("Hello!");
@@ -32,19 +38,27 @@ app.get("/hello", (req, res) => {
 });
 // Show urls_index at /urls
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["name"]
+  };
+  console.log(templateVars);
   res.render("urls_index", templateVars);
 });
 // Create new URL page urls_new at /urls/new
 // Put /urls/new ahead of /urls/:id so that "new" isn't treated as a short URL id
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {
+    username: req.cookies["name"]
+  };
+  res.render("urls_new", templateVars);
 });
 // GET route to urls_show in form urls/:id
 app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
-    fullURL: urlDatabase[req.params.id]
+    fullURL: urlDatabase[req.params.id],
+    username: req.cookies["name"]
   };
   res.render("urls_show", templateVars);
 });
@@ -63,7 +77,6 @@ app.post("/login", (req, res) => {
   // Set a cookie with Express's built in res.cookie
   res.cookie("name", req.body.username);
   console.log("Our user submitted req.body.username: " + req.body.username);
-  console.log("This cookie is associated with req.cookies: " + req.cookies.name);
   // After logging in, redirect to /urls
   res.redirect("/urls");
 });

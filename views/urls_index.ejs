@@ -7,7 +7,10 @@
   <% include partials/_header.ejs %>
   <ul>
     <% for(var key in urls) { %>
-      <li><%= key + ': ' + urls[key] %></li>
+      <li>
+        <%= key + ': ' + urls[key] %>
+        <form method="POST" action="/urls/<%= key %>/delete"><button>Delete</button></form>
+      </li>
     <% } %>
       <li>
         <a href="#">Shorten a new URL</a>

@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>TinyApp: URLs Index</title>
-</head>
-<body>
-  <% include partials/_header.ejs %>
-  <ul>
-    <% for(var key in urls) { %>
-      <li>
-        <a href="/urls/<%= key %>"><%= key %></a>: <a href="<%= urls[key] %>"><%= urls[key] %></a>
-        <a href="/urls/<%= key %>">Edit</a>
-        <form method="POST" action="/urls/<%= key %>/delete"><button>Delete</button></form>
-      </li>
-    <% } %>
-      <li>
-        <a href="/urls/new">Shorten a new URL</a>
-      </li>
-  </ul>
-</body>
+  <head>
+    <title>TinyApp: URLs Index</title>
+  </head>
+  <body>
+    <% include partials/_header.ejs %>
+    <ul>
+      <% for(var key in urls) { %>
+        <li>
+          <a href="/urls/<%= key %>"><%= key %></a>: <a href="<%= urls[key] %>"><%= urls[key] %></a>
+          <a href="/urls/<%= key %>">Edit</a>
+          <form method="POST" action="/urls/<%= key %>/delete"><button>Delete</button></form>
+        </li>
+      <% } %>
+        <li>
+          <a href="/urls/new">Shorten a new URL</a>
+        </li>
+    </ul>
+  </body>
 </html>

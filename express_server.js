@@ -58,6 +58,13 @@ app.post("/urls", (req, res) => {
   // Respond with a redirect to /urls/newRandomString
   res.redirect('/urls/' + newRandomString);
 });
+// POST route for logging in and becoming cookied
+app.post("/login", (req, res) => {
+  res.cookie("name", req.body.username);
+  console.log("Our user submitted req.body.username: " + req.body.username);
+  console.log("This cookie is associated with req.cookies: " + req.cookies.name);
+  res.redirect("/urls");
+});
 // POST route for deleting existing shortened URLs
 app.post("/urls/:id/delete", (req, res) => {
   // Delete the URL from our urlDatabase object using its id as the key

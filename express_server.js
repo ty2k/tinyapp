@@ -96,6 +96,11 @@ app.post("/urls/:id", (req, res) => {
   // Redirect back to the urls index page
   res.redirect('/urls');
 });
+// POST route to logout and remove the user's cookie
+app.post("/logout", (req, res) => {
+  res.clearCookie("name", req.body.username);
+  res.redirect("/urls");
+});
 // Our actual URL redirection GET route
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];

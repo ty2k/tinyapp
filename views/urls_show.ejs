@@ -7,8 +7,8 @@
     <% include partials/_header.ejs %>
     <h2>Shortened URL Details</h2>
     <ul>
-      <li>Shortened: /<%= shortURL %></li>
-      <li>Full: <%= fullURL %></li>
+      <li>Shortened: <a href="/<%= shortURL %>">/<%= shortURL %></a></li>
+      <li>Full: <a href="<%= fullURL %>"><%= fullURL %></a></li>
       <li>Update:
         <form action="/urls/:id" method="POST">
         <label for="newLongURL">Enter an updated URL:</label>

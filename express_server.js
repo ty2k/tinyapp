@@ -101,6 +101,10 @@ app.post("/logout", (req, res) => {
   res.clearCookie("name", req.body.username);
   res.redirect("/urls");
 });
+// GET route to /register to show registration form
+app.get("/register", (req, res) => {
+  res.render("register", templateVars);
+});
 // Our actual URL redirection GET route
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];

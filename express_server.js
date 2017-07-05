@@ -47,6 +47,12 @@ app.post("/urls", (req, res) => {
   // Respond with a redirect to /urls/newRandomString
   res.redirect('/urls/' + newRandomString);
 });
+app.post("/urls/:id/delete", (req, res) => {
+  // Delete the URL from our urlDatabase object using its id as the key
+  delete urlDatabase[req.params.id];
+  // Redirect back to the urls index page
+  res.redirect('/urls');
+});
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   // Respond with a redirection to longURL

@@ -2,11 +2,21 @@
   <h1>Header Title</h1>
 </header>
 
-<!-- Login form -->
-<form action ="/login" method="POST">
-  <label for="username">Username:</label>
-  <input id="username" name="username" placeholder="username" type="text">
-  <input type="submit" value="Submit">
-</form>
+<!-- If user is logged in, display a logout button-->
+<% if (username !== undefined) { %>
+  <p>Logged in as <strong><%= username %></strong>.</p>
+  <!-- Logout form -->
+  <form action="/logout" method="POST">
+    <input type="submit" value="Logout">
+  </form>
+<!-- If user is not logged in, display the login form -->
+<% } else{ %>
+  <!-- Login form -->
+  <form action ="/login" method="POST">
+    <label for="username">Username:</label>
+    <input id="username" name="username" placeholder="username" type="text">
+    <input type="submit" value="Submit">
+  </form>
+<% } %>
 
-<p>Logged in as <strong><%= username %></strong>.</p>
+

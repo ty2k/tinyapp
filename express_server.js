@@ -1,7 +1,9 @@
 "use strict";
 
 const express = require("express");
+const cookieParser = require('cookie-parser')
 const app = express();
+app.use(cookieParser());
 const PORT = process.env.PORT || 8080; // default port 8080
 
 app.set("view engine", "ejs")

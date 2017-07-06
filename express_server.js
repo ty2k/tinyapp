@@ -149,8 +149,17 @@ app.post("/login", (req, res) => {
 });
 // POST route for deleting existing shortened URLs
 app.post("/urls/:id/delete", (req, res) => {
-  // Delete the URL from our urlDatabase object using its id as the key
-  delete urlDatabase[req.params.id];
+  console.log("req.params of delete request: ");
+  console.log(req.params);
+  console.log(urlDatabase[req.params.id]);
+  console.log("User who created the link: ");
+  console.log(urlDatabase[req.params.id].userID); // userID who created the link
+  console.log("User attempting to delete the link: ");
+  console.log(users[req.cookies["user_id"]].id); // userID trying to delete
+  if (urlDatabase[req.params.id].userID === users[req.cookies["user_id"]].id) {
+    // Delete the URL from our urlDatabase object using its id as the key
+    delete urlDatabase[req.params.id];
+  }
   // Redirect back to the urls index page
   res.redirect('/urls');
 });

@@ -119,15 +119,26 @@ app.get("/register", (req, res) => {
 // POST route to /register to show registration form
 app.post("/register", (req, res) => {
   console.log(req.body);  // debug statement to see POST parameters
-  let newRandomString = generateRandomString();
-  users[newRandomString] = {
-    id: newRandomString,
-    email: req.body.email,
-    password: req.body.password
+  for (let userId in users) {
+    if (users.hasOwnProperty(userId)) {
+      if (req.body.email === users[userId].email) {
+        res.status(400).send({ error: "Email address already in database" });
+      }
+    }
+  }
+  if (req.body.email === '' || req.body.password === '') {
+    res.status(400).send({ error: "Invalid username or password" });
+  } else {
+    let newRandomString = generateRandomString();
+    users[newRandomString] = {
+      id: newRandomString,
+      email: req.body.email,
+      password: req.body.password
+    }
+    res.cookie("user_id", newRandomString);
+    console.log(users); // debug statement
+    res.redirect("/urls");
   };
-  res.cookie("user_id", newRandomString);
-  console.log(users); // debug statement
-  res.redirect("/urls");
 });
 // Our actual URL redirection GET route
 app.get("/u/:shortURL", (req, res) => {

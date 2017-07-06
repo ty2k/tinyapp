@@ -86,6 +86,13 @@ app.post("/urls", (req, res) => {
   // Respond with a redirect to /urls/newRandomString
   res.redirect('/urls/' + newRandomString);
 });
+// GET route for login page
+app.get("/login", (req, res) => {
+  let templateVars = {
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("login", templateVars);
+});
 // POST route for logging in and becoming cookied
 app.post("/login", (req, res) => {
   // Set a cookie with Express's built in res.cookie

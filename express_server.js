@@ -95,11 +95,37 @@ app.get("/login", (req, res) => {
 });
 // POST route for logging in and becoming cookied
 app.post("/login", (req, res) => {
-  // Set a cookie with Express's built in res.cookie
-  res.cookie("name", req.body.username);
-  console.log("Our user submitted req.body.username: " + req.body.username);
-  // After logging in, redirect to /urls
-  res.redirect("/urls");
+  let existingEmails = [];
+  let matchedUserId = '';
+  // Fill an array with our existing emails
+  for (let userId in users) {
+    if (users.hasOwnProperty(userId)) {
+      existingEmails.push(users[userId].email);
+    }
+  }
+  // If the submitted email is not in the array, 403
+  if (existingEmails.indexOf(req.body.email) === -1) {
+    console.log("Email doesn't exist in database");
+    res.status(403).send({ error: "Invalid email address or password" });
+  } else { // If the submitted is in the array, get the ID associated with it
+    for (let userId in users) {
+      if (users.hasOwnProperty(userId)) {
+        if (users[userId].email === req.body.email) {
+          matchedUserId = userId;
+        }
+      }
+    }
+    // Check the matched ID password against the submitted password
+    // If the passwords match, redirected to /urls and set cookie
+    if (users[matchedUserId].password === req.body.password) {
+      console.log("Password matches");
+      res.cookie("user_id", matchedUserId);
+      res.redirect('/urls');
+    } else { // If the passwords don't match, 403
+      console.log("Passwords don't match");
+      res.status(403).send({ error: "Invalid email address or password" });
+    }
+  }
 });
 // POST route for deleting existing shortened URLs
 app.post("/urls/:id/delete", (req, res) => {

@@ -221,7 +221,7 @@ app.post("/register", (req, res) => {
 });
 // Our actual URL redirection GET route
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
+  let longURL = urlDatabase[req.params.shortURL].url;
   // Respond with a redirection to longURL
   res.redirect(longURL);
 });

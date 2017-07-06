@@ -103,6 +103,9 @@ app.post("/logout", (req, res) => {
 });
 // GET route to /register to show registration form
 app.get("/register", (req, res) => {
+  let templateVars = {
+    username: req.cookies["name"]
+  };
   res.render("register", templateVars);
 });
 // Our actual URL redirection GET route

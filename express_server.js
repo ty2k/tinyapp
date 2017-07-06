@@ -58,14 +58,14 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]]
   };
-  console.log("Contents of req.cookies in GET /urls: ");
+  /*console.log("Contents of req.cookies in GET /urls: ");
   console.log(req.cookies);
   console.log("Contents of user in templateVars in GET /urls: ");
   console.log(templateVars.user);
   console.log("templateVars at GET /urls:")
-  console.log(templateVars);
-  console.log("urls variable: ");
-  console.log(templateVars.urls);
+  console.log(templateVars);*/
+  console.log("user variable: ");
+  console.log(templateVars.user);
   res.render("urls_index", templateVars);
 });
 // Create new URL page urls_new at /urls/new

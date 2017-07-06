@@ -65,7 +65,12 @@ app.get("/urls/new", (req, res) => {
     user: users[req.cookies["user_id"]]
   };
   console.log()
-  res.render("urls_new", templateVars);
+  if (users[req.cookies["user_id"]] !== undefined) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
+  }
+
 });
 // GET route to urls_show in form urls/:id
 app.get("/urls/:id", (req, res) => {

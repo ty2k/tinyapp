@@ -12,9 +12,5 @@
 <!-- If user is not logged in, display the login form -->
 <% } else{ %>
   <!-- Login form -->
-  <form action ="/login" method="POST">
-    <label for="username">Login with username:</label>
-    <input id="username" name="username" placeholder="username" type="text">
-    <input type="submit" value="Submit">
-  </form>
+  <a href="/login">Login</a>
 <% } %>

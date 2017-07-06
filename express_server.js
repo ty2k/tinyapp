@@ -165,10 +165,11 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 // POST route to change an existing shortened URL
 app.post("/urls/:id", (req, res) => {
+  console.log("req.body in POST route to change a URL: ");
   console.log(req.body); // debug statement to see POST parameters
   let fullURL = req.body.newLongURL;
   let shortURL = req.body.shortURL;
-  urlDatabase[shortURL] = fullURL;
+  urlDatabase[shortURL].url = fullURL;
   // Redirect back to the urls index page
   res.redirect('/urls');
 });

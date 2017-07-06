@@ -145,7 +145,7 @@ app.post("/urls/:id", (req, res) => {
 });
 // POST route to logout and remove the user's cookie
 app.post("/logout", (req, res) => {
-  res.clearCookie("name", req.body.username);
+  res.clearCookie("user_id", req.body.email);
   res.redirect("/urls");
 });
 // GET route to /register to show registration form

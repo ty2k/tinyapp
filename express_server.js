@@ -15,12 +15,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 // Instead of an actual URL database, use a dummy database object for now
 const urlDatabase = {
   "b2xVn2": {
-    shortUrl: "b2xVn2",
+    id: "b2xVn2",
     userID: "userRandomID",
     url: "http://www.lighthouselabs.ca"
   },
   "9sm5xK": {
-    shortUrl: "9sm5xK",
+    id: "9sm5xK",
     userID: "user2RandomID",
     url: "http://www.google.com"
   }
@@ -85,7 +85,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
-    fullURL: urlDatabase[req.params.id],
+    fullURL: urlDatabase[req.params.id].url,
     user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);

@@ -95,7 +95,12 @@ app.post("/urls", (req, res) => {
   console.log(req.body);  // debug statement to see POST parameters
   let fullURL = req.body.longURL;
   let newRandomString = generateRandomString();
-  urlDatabase[newRandomString] = fullURL;
+  urlDatabase[newRandomString] = {
+    id: newRandomString,
+    userID: "unknown",
+    url: fullURL
+  };
+  //urlDatabase[newRandomString].url = fullURL;
   console.log(urlDatabase);
   // Respond with a redirect to /urls/newRandomString
   res.redirect('/urls/' + newRandomString);

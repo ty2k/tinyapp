@@ -74,7 +74,8 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.cookies["user_id"]]
   };
-  console.log()
+  console.log("templateVars in GET route to /urls/new: ");
+  console.log(templateVars);
   if (users[req.cookies["user_id"]] !== undefined) {
     res.render("urls_new", templateVars);
   } else {
@@ -92,15 +93,15 @@ app.get("/urls/:id", (req, res) => {
 });
 // POST route for new URLs being shortened
 app.post("/urls", (req, res) => {
+  console.log("req.body for POST route to /urls: ");
   console.log(req.body);  // debug statement to see POST parameters
-  let fullURL = req.body.longURL;
   let newRandomString = generateRandomString();
   urlDatabase[newRandomString] = {
     id: newRandomString,
-    userID: "unknown",
-    url: fullURL
+    userID: req.body.userID,
+    url: req.body.longURL
   };
-  //urlDatabase[newRandomString].url = fullURL;
+  console.log("urlDatabase in POST route to /urls: ");
   console.log(urlDatabase);
   // Respond with a redirect to /urls/newRandomString
   res.redirect('/urls/' + newRandomString);

@@ -3,8 +3,8 @@
 </header>
 
 <!-- If user is logged in, display a logout button-->
-<% if (username !== undefined) { %>
-  <p>Logged in as <strong><%= username %></strong>.</p>
+<% if (user !== undefined) { %>
+  <p>Logged in as <strong><%= user.email %></strong>.</p>
   <!-- Logout form -->
   <form action="/logout" method="POST">
     <input type="submit" value="Logout">
@@ -18,5 +18,3 @@
     <input type="submit" value="Submit">
   </form>
 <% } %>
-
-

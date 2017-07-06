@@ -48,8 +48,14 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["name"]
+    //username: req.cookies["user_id"],
+    user: users[req.cookies["user_id"]]
   };
+  console.log("Contents of req.cookies in GET /urls: ");
+  console.log(req.cookies);
+  console.log("Contents of user in templateVars in GET /urls: ");
+  console.log(templateVars.user);
+  console.log("templateVars at GET /urls:")
   console.log(templateVars);
   res.render("urls_index", templateVars);
 });
@@ -57,8 +63,10 @@ app.get("/urls", (req, res) => {
 // Put /urls/new ahead of /urls/:id so that "new" isn't treated as a short URL id
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["name"]
+    //username: req.cookies["name"],
+    user: users[req.cookies["user_id"]]
   };
+  console.log()
   res.render("urls_new", templateVars);
 });
 // GET route to urls_show in form urls/:id
@@ -66,7 +74,8 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
     fullURL: urlDatabase[req.params.id],
-    username: req.cookies["name"]
+    //username: req.cookies["name"],
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
 });
@@ -112,12 +121,14 @@ app.post("/logout", (req, res) => {
 // GET route to /register to show registration form
 app.get("/register", (req, res) => {
   let templateVars = {
-    username: req.cookies["name"]
+    //username: req.cookies["name"],
+    user: users[req.cookies["user_id"]]
   };
   res.render("register", templateVars);
 });
 // POST route to /register to show registration form
 app.post("/register", (req, res) => {
+  console.log("Contents of req.body in POST to /register route: ")
   console.log(req.body);  // debug statement to see POST parameters
   for (let userId in users) {
     if (users.hasOwnProperty(userId)) {
@@ -136,6 +147,7 @@ app.post("/register", (req, res) => {
       password: req.body.password
     }
     res.cookie("user_id", newRandomString);
+    console.log("users object in POST /register before redirect to /urls: ")
     console.log(users); // debug statement
     res.redirect("/urls");
   };

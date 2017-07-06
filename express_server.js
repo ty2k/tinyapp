@@ -48,7 +48,6 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    //username: req.cookies["user_id"],
     user: users[req.cookies["user_id"]]
   };
   console.log("Contents of req.cookies in GET /urls: ");
@@ -63,7 +62,6 @@ app.get("/urls", (req, res) => {
 // Put /urls/new ahead of /urls/:id so that "new" isn't treated as a short URL id
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    //username: req.cookies["name"],
     user: users[req.cookies["user_id"]]
   };
   console.log()
@@ -74,7 +72,6 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
     fullURL: urlDatabase[req.params.id],
-    //username: req.cookies["name"],
     user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
@@ -121,7 +118,6 @@ app.post("/logout", (req, res) => {
 // GET route to /register to show registration form
 app.get("/register", (req, res) => {
   let templateVars = {
-    //username: req.cookies["name"],
     user: users[req.cookies["user_id"]]
   };
   res.render("register", templateVars);
@@ -137,8 +133,10 @@ app.post("/register", (req, res) => {
       }
     }
   }
-  if (req.body.email === '' || req.body.password === '') {
-    res.status(400).send({ error: "Invalid username or password" });
+  if (req.body.email === '') {
+    res.status(400).send({ error: "Need an email address" });
+  } else if (req.body.password === '') {
+    res.status(400).send({ error: "Need a password" });
   } else {
     let newRandomString = generateRandomString();
     users[newRandomString] = {

@@ -32,12 +32,6 @@ const users = {
   }
 }
 
-// Pass our logged in user's username from their cookie to the the templates
-/*let templateVars = {
-  username: req.cookies["username"],
-};
-res.render("urls_index", templateVars);*/
-
 // Hello at root
 app.get("/", (req, res) => {
   res.end("Hello!");
@@ -121,6 +115,19 @@ app.get("/register", (req, res) => {
     username: req.cookies["name"]
   };
   res.render("register", templateVars);
+});
+// POST route to /register to show registration form
+app.post("/register", (req, res) => {
+  console.log(req.body);  // debug statement to see POST parameters
+  let newRandomString = generateRandomString();
+  users[newRandomString] = {
+    id: newRandomString,
+    email: req.body.email,
+    password: req.body.password
+  };
+  res.cookie("user_id", newRandomString);
+  console.log(users); // debug statement
+  res.redirect("/urls");
 });
 // Our actual URL redirection GET route
 app.get("/u/:shortURL", (req, res) => {

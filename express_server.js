@@ -169,7 +169,13 @@ app.post("/urls/:id", (req, res) => {
   console.log(req.body); // debug statement to see POST parameters
   let fullURL = req.body.newLongURL;
   let shortURL = req.body.shortURL;
-  urlDatabase[shortURL].url = fullURL;
+  console.log("req.body.userID: ");
+  console.log(req.body.userID);
+  console.log("urlDatabase[shortURL].userID: ")
+  console.log(urlDatabase[shortURL].userID);
+  if (req.body.userID === urlDatabase[shortURL].userID) {
+    urlDatabase[shortURL].url = fullURL;
+  }
   // Redirect back to the urls index page
   res.redirect('/urls');
 });

@@ -1,17 +1,17 @@
 "use strict";
 
 const express = require("express");
-var cookieSession = require('cookie-session');
+var cookieSession = require("cookie-session");
 const app = express();
 app.use(cookieSession({
-  name: 'session',
-  keys: [ 'key1', 'key2' ],
+  name: "session",
+  keys: [ "key1", "key2" ],
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 const PORT = process.env.PORT || 8080; // default port 8080
 
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 app.set("view engine", "ejs")
 
@@ -124,7 +124,7 @@ app.post("/urls", (req, res) => {
   console.log("urlDatabase in POST route to /urls: ");
   console.log(urlDatabase);
   // Respond with a redirect to /urls/newRandomString
-  res.redirect('/urls/' + newRandomString);
+  res.redirect("/urls/" + newRandomString);
 });
 // GET route for login page
 app.get("/login", (req, res) => {
@@ -136,7 +136,7 @@ app.get("/login", (req, res) => {
 // POST route for logging in and becoming cookied
 app.post("/login", (req, res) => {
   let existingEmails = [];
-  let matchedUserId = '';
+  let matchedUserId = "";
   // Fill an array with our existing emails
   for (let userId in users) {
     if (users.hasOwnProperty(userId)) {
@@ -161,7 +161,7 @@ app.post("/login", (req, res) => {
     if (bcrypt.compareSync(req.body.password, users[matchedUserId].hashedPassword)) {
       console.log("Password matches");
       req.session.user_id = matchedUserId;
-      res.redirect('/urls');
+      res.redirect("/urls");
     } else { // If the passwords don't match, 403
       console.log("Passwords don't match");
       res.status(403).send({ error: "Invalid email address or password" });
@@ -182,7 +182,7 @@ app.post("/urls/:id/delete", (req, res) => {
     delete urlDatabase[req.params.id];
   }
   // Redirect back to the urls index page
-  res.redirect('/urls');
+  res.redirect("/urls");
 });
 // POST route to change an existing shortened URL
 app.post("/urls/:id", (req, res) => {
@@ -198,7 +198,7 @@ app.post("/urls/:id", (req, res) => {
     urlDatabase[shortURL].url = fullURL;
   }
   // Redirect back to the urls index page
-  res.redirect('/urls');
+  res.redirect("/urls");
 });
 // POST route to logout and remove the user's cookie
 app.post("/logout", (req, res) => {
@@ -223,9 +223,9 @@ app.post("/register", (req, res) => {
       }
     }
   }
-  if (req.body.email === '') {
+  if (req.body.email === "") {
     res.status(400).send({ error: "Need an email address" });
-  } else if (req.body.password === '') {
+  } else if (req.body.password === "") {
     res.status(400).send({ error: "Need a password" });
   } else {
     let newRandomString = generateRandomString();

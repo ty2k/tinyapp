@@ -103,13 +103,18 @@ app.get("/urls/new", (req, res) => {
 });
 // GET route to urls_show in form urls/:id
 app.get("/urls/:id", (req, res) => {
-  let templateVars = {
+  // If the requested shortened URL isn't in our database, redirect to index
+  if (urlDatabase[req.params.id] === undefined) {
+    res.redirect("/urls");
+  } else { // Else if it is, render the URL details
+    let templateVars = {
     shortURL: req.params.id,
     fullURL: urlDatabase[req.params.id].url,
     urlUserID: urlDatabase[req.params.id].userID,
     user: users[req.session["user_id"]]
   };
   res.render("urls_show", templateVars);
+  }
 });
 // POST route for new URLs being shortened
 app.post("/urls", (req, res) => {
@@ -243,7 +248,6 @@ app.post("/register", (req, res) => {
 // Our actual URL redirection GET route
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL].url;
-  console.log(longURL);
   // Respond with a redirection to longURL
   res.redirect(longURL);
 });
@@ -267,15 +271,10 @@ function urlsForUser(id) {
   let urlsBelongingToUser = {};
   for (let urlID in urlDatabase) {
     if (urlDatabase.hasOwnProperty(urlID)) {
-      //console.log("The userID: " + urlDatabase[urlID].userID);
-      //console.log("The id: ");
-      //console.log(id);
       if (urlDatabase[urlID].userID === id) {
         urlsBelongingToUser[urlID] = urlDatabase[urlID];
       }
     }
   }
-  //console.log("urlsBelongingToUser in own function: ")
-  //console.log(urlsBelongingToUser)
   return urlsBelongingToUser;
 }

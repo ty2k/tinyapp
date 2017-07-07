@@ -212,9 +212,16 @@ app.post("/register", (req, res) => {
 });
 // Our actual URL redirection GET route
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL].url;
-  // Respond with a redirection to longURL
-  res.redirect(longURL);
+  // If the shortURL is invalid, display an error page
+  if (urlDatabase[req.params.shortURL] === undefined) {
+    let templateVars = {
+      user: users[req.session.user_id]
+    };
+    res.render("urls_invalid", templateVars);
+  } else { // Otherwise direct to the long URL
+    let longURL = urlDatabase[req.params.shortURL].url;
+    res.redirect(longURL);
+  }
 });
 
 // Persistent listener after all routes have been defined

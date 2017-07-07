@@ -6,6 +6,8 @@ const app = express();
 app.use(cookieParser());
 const PORT = process.env.PORT || 8080; // default port 8080
 
+const bcrypt = require('bcrypt');
+
 app.set("view engine", "ejs")
 
 // Require body-parser
@@ -31,12 +33,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple"
+    hashedPassword: "$2a$10$.h4h.MdXZ1dvfD1irSpW/eBFnw7W8zJ.hnwuRESc/CEl0f7N3drva",
   },
  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher"
+    hashedPassword: "$2a$10$RJtBCOtiQCZ4Mdh127m9GuRJkpnLs9Em6khLeBRuFDWPWbyUjFarS"
   }
 };
 
@@ -60,7 +62,7 @@ app.get("/urls", (req, res) => {
   if (req.cookies["user_id"] === undefined) {
     urlsToDisplay = {};
   } else {
-    urlsToDisplay = urlsForUser(users[req.cookies["user_id"]].id);
+    urlsToDisplay = urlsForUser(req.cookies["user_id"]);
   }
   console.log("Urls to Display: ");
   console.log(urlsToDisplay);
@@ -148,9 +150,10 @@ app.post("/login", (req, res) => {
         }
       }
     }
-    // Check the matched ID password against the submitted password
-    // If the passwords match, redirected to /urls and set cookie
-    if (users[matchedUserId].password === req.body.password) {
+    // Check the matched ID hashed password against the submitted password that we will hash here. If the passwords match, redirected to /urls and set cookie
+    let hashedPassword = bcrypt.hashSync(req.body.password, 10);
+    console.log(hashedPassword);
+    if (bcrypt.compareSync(req.body.password, users[matchedUserId].hashedPassword)) {
       console.log("Password matches");
       res.cookie("user_id", matchedUserId);
       res.redirect('/urls');
@@ -224,7 +227,7 @@ app.post("/register", (req, res) => {
     users[newRandomString] = {
       id: newRandomString,
       email: req.body.email,
-      password: req.body.password
+      hashedPassword: bcrypt.hashSync(req.body.password, 10)
     }
     res.cookie("user_id", newRandomString);
     console.log("users object in POST /register before redirect to /urls: ")
@@ -254,6 +257,7 @@ function generateRandomString() {
   return randomString;
 }
 
+// Take the user's id and spit out an object that contains the links they own
 function urlsForUser(id) {
   let urlsBelongingToUser = {};
   for (let urlID in urlDatabase) {

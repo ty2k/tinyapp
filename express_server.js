@@ -31,12 +31,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "purple"
   },
  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: "dishwasher"
   }
 };
 
@@ -54,18 +54,30 @@ app.get("/hello", (req, res) => {
 });
 // Show urls_index at /urls
 app.get("/urls", (req, res) => {
+  console.log("Contents of req.cookies.user_id: ");
+  console.log(req.cookies["user_id"]);
+  let urlsToDisplay = {};
+  if (req.cookies["user_id"] === undefined) {
+    urlsToDisplay = {};
+  } else {
+    urlsToDisplay = urlsForUser(users[req.cookies["user_id"]].id);
+  }
+  console.log("Urls to Display: ");
+  console.log(urlsToDisplay);
   let templateVars = {
-    urls: urlDatabase,
-    user: users[req.cookies["user_id"]]
+    urls: urlsToDisplay,
+    user: users[req.cookies["user_id"]],
   };
-  /*console.log("Contents of req.cookies in GET /urls: ");
-  console.log(req.cookies);
-  console.log("Contents of user in templateVars in GET /urls: ");
-  console.log(templateVars.user);
-  console.log("templateVars at GET /urls:")
-  console.log(templateVars);*/
-  console.log("user variable: ");
-  console.log(templateVars.user);
+  //console.log("Contents of req.cookies in GET /urls: ");
+  //console.log(req.cookies);
+  console.log("Contents of urlsForUser in templateVars in GET /urls: ");
+  console.log(templateVars.urlsForUser);
+  //console.log("templateVars at GET /urls:")
+  //console.log(templateVars);
+  //console.log("user variable: ");
+  //console.log(templateVars.user);
+  //console.log("Output of urlsForUser in GET /urls: ")
+  //urlsForUser(users[req.cookies["user_id"]].id);
   res.render("urls_index", templateVars);
 });
 // Create new URL page urls_new at /urls/new
@@ -87,6 +99,7 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
     fullURL: urlDatabase[req.params.id].url,
+    urlUserID: urlDatabase[req.params.id].userID,
     user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
@@ -222,6 +235,7 @@ app.post("/register", (req, res) => {
 // Our actual URL redirection GET route
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL].url;
+  console.log(longURL);
   // Respond with a redirection to longURL
   res.redirect(longURL);
 });
@@ -238,4 +252,21 @@ function generateRandomString() {
   for (let i = 0; i < 6; i++)
     randomString += alphaNums.charAt(Math.floor(Math.random() * alphaNums.length));
   return randomString;
+}
+
+function urlsForUser(id) {
+  let urlsBelongingToUser = {};
+  for (let urlID in urlDatabase) {
+    if (urlDatabase.hasOwnProperty(urlID)) {
+      //console.log("The userID: " + urlDatabase[urlID].userID);
+      //console.log("The id: ");
+      //console.log(id);
+      if (urlDatabase[urlID].userID === id) {
+        urlsBelongingToUser[urlID] = urlDatabase[urlID];
+      }
+    }
+  }
+  //console.log("urlsBelongingToUser in own function: ")
+  //console.log(urlsBelongingToUser)
+  return urlsBelongingToUser;
 }

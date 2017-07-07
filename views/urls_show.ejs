@@ -5,19 +5,26 @@
   </head>
   <body>
     <% include partials/_header.ejs %>
-    <h2>Shortened URL Details</h2>
-    <ul>
-      <li>Shortened: <a href="/u/<%= shortURL %>">/u/<%= shortURL %></a></li>
-      <li>Full: <a href="<%= fullURL %>"><%= fullURL %></a></li>
-      <li>Update:
-        <form action="/urls/:id" method="POST">
-        <label for="newLongURL">Enter an updated URL:</label>
-        <input id="newLongURL" type="text" name="newLongURL" placeholder="http://">
-        <input id="shortURL" type="hidden" name="shortURL" value="<%= shortURL %>">
-        <input id="userID" type="hidden" name="userID" value="<%= user.id %>">
-        <input type="submit" value="Update">
-      </form>
-      </li>
-    </ul>
+    <!--If not logged in, display nothing but header -->
+    <% if (user === undefined) { %>
+      <p>If you were to <a href="/register">register</a> or <a href="/login">login</a>, this page would be a <strong>lot</strong> more interesting.
+    <% } else if (urlUserID !== user.id ) { %>
+      <p>It looks like this link doesn't belong to you. You can still see <a href="/u/<%= shortURL %>">where it goes</a>, but you can't edit it. Why not <a href="/urls/new">make your own shortened URL</a>?</p>
+    <% } else { %> <!-- If logged in, show the update form-->
+      <h2>Shortened URL Details</h2>
+      <ul>
+        <li>Shortened: <a href="/u/<%= shortURL %>">/u/<%= shortURL %></a></li>
+        <li>Full: <a href="<%= fullURL %>"><%= fullURL %></a></li>
+        <li>Update:
+          <form action="/urls/:id" method="POST">
+            <label for="newLongURL">Enter an updated URL:</label>
+            <input id="newLongURL" type="text" name="newLongURL" placeholder="http://">
+            <input id="shortURL" type="hidden" name="shortURL" value="<%= shortURL %>">
+            <input id="userID" type="hidden" name="userID" value="<%= user.id %>">
+            <input type="submit" value="Update">
+          </form>
+        </li>
+      </ul>
+    <% } %>
   </body>
 </html>

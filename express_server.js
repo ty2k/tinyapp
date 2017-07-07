@@ -86,17 +86,24 @@ app.get("/urls/new", (req, res) => {
 });
 // GET route to urls_show in form urls/:id
 app.get("/urls/:id", (req, res) => {
-  // If the requested shortened URL isn't in our database, redirect to index
+  let fullURL = "";
+  // If the requested URL isn't in our database, set templateVars as such
   if (urlDatabase[req.params.id] === undefined) {
-    res.redirect("/urls");
-  } else { // Else if it is, render the URL details
     let templateVars = {
-    shortURL: req.params.id,
-    fullURL: urlDatabase[req.params.id].url,
-    urlUserID: urlDatabase[req.params.id].userID,
-    user: users[req.session["user_id"]]
-  };
-  res.render("urls_show", templateVars);
+      shortURL: req.params.id,
+      fullURL: undefined,
+      urlUserID: undefined,
+      user: users[req.session["user_id"]]
+    };
+    res.render("urls_show", templateVars);
+  } else { // Else if the URL is in our database, set the templateVars correctly
+    let templateVars = {
+      shortURL: req.params.id,
+      fullURL: urlDatabase[req.params.id].url,
+      urlUserID: urlDatabase[req.params.id].userID,
+      user: users[req.session["user_id"]]
+    };
+    res.render("urls_show", templateVars);
   }
 });
 // POST route for new URLs being shortened

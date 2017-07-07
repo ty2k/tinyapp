@@ -5,11 +5,17 @@
   </head>
   <body>
     <% include partials/_header.ejs %>
+    <% if (fullURL === undefined) { %>
+      <p>That's not a valid URL. Why not <a href="/urls/new">make your own shortened URL</a> or <a href="/urls/">view the ones you have shortened already</a>?</p>
+    <% } else if (user === undefined) { %>
     <!-- If a user is not logged in, show them the way to register or login -->
-    <% if (user === undefined) { %>
-      <p>This page is used to edit the details of a shortened URL, and you need to be logged in to use it. You can still see <a href="/u/<%= shortURL %>">where the short link goes</a>, but you can't edit it. If you were to <a href="/register">register</a> or <a href="/login">login</a>, this page would be a <strong>lot</strong> more interesting.
+      <p>This page is used to edit the details of a shortened URL, and you need to be logged in to use it.</p>
+      <p>You can still see <a href="/u/<%= shortURL %>">use the short link</a> (it goes to <a href="<%= fullURL %>"><%= fullURL %></a>), but you can't edit it.</p>
+      <p>If you were to <a href="/register">register</a> or <a href="/login">login</a>, this page would be a <strong>lot</strong> more interesting.
     <% } else if (urlUserID !== user.id ) { %> <!-- If a user is logged in, but doesn't own this URL, they can see where it goes or make their own -->
-      <p>It looks like this link doesn't belong to you. You can still see <a href="/u/<%= shortURL %>">where the short link goes</a>, but you can't edit it. Why not <a href="/urls/new">make your own shortened URL</a> or <a href="/urls/">view the ones you have shortened already</a>?</p>
+      <p>It looks like this link doesn't belong to you.</p>
+      <p>You can still see <a href="/u/<%= shortURL %>">use the short link</a> (it goes to <a href="<%= fullURL %>"><%= fullURL %></a>), but you can't edit it.</p>
+      <p>Why not <a href="/urls/new">make your own shortened URL</a> or <a href="/urls/">view the ones you have shortened already</a>?</p>
     <% } else { %> <!-- If logged in, show the update form-->
       <h2>Shortened URL Details</h2>
       <ul>

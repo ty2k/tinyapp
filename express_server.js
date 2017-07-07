@@ -1,9 +1,14 @@
 "use strict";
 
 const express = require("express");
-const cookieParser = require('cookie-parser')
+var cookieSession = require('cookie-session');
 const app = express();
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: [ 'key1', 'key2' ],
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 const PORT = process.env.PORT || 8080; // default port 8080
 
 const bcrypt = require('bcrypt');
@@ -56,24 +61,24 @@ app.get("/hello", (req, res) => {
 });
 // Show urls_index at /urls
 app.get("/urls", (req, res) => {
-  console.log("Contents of req.cookies.user_id: ");
-  console.log(req.cookies["user_id"]);
+  console.log("req.session.user_id: ");
+  console.log(req.session.user_id);
   let urlsToDisplay = {};
-  if (req.cookies["user_id"] === undefined) {
+  if (req.session.user_id === undefined) {
     urlsToDisplay = {};
   } else {
-    urlsToDisplay = urlsForUser(req.cookies["user_id"]);
+    urlsToDisplay = urlsForUser(req.session.user_id);
   }
   console.log("Urls to Display: ");
   console.log(urlsToDisplay);
   let templateVars = {
     urls: urlsToDisplay,
-    user: users[req.cookies["user_id"]],
+    user: users[req.session.user_id]
   };
   //console.log("Contents of req.cookies in GET /urls: ");
   //console.log(req.cookies);
-  console.log("Contents of urlsForUser in templateVars in GET /urls: ");
-  console.log(templateVars.urlsForUser);
+  console.log("Contents of templateVars");
+  console.log(templateVars.user);
   //console.log("templateVars at GET /urls:")
   //console.log(templateVars);
   //console.log("user variable: ");
@@ -86,11 +91,11 @@ app.get("/urls", (req, res) => {
 // Put /urls/new ahead of /urls/:id so that "new" isn't treated as a short URL id
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session["user_id"]]
   };
   console.log("templateVars in GET route to /urls/new: ");
   console.log(templateVars);
-  if (users[req.cookies["user_id"]] !== undefined) {
+  if (users[req.session["user_id"]] !== undefined) {
     res.render("urls_new", templateVars);
   } else {
     res.redirect("/login");
@@ -102,7 +107,7 @@ app.get("/urls/:id", (req, res) => {
     shortURL: req.params.id,
     fullURL: urlDatabase[req.params.id].url,
     urlUserID: urlDatabase[req.params.id].userID,
-    user: users[req.cookies["user_id"]]
+    user: users[req.session["user_id"]]
   };
   res.render("urls_show", templateVars);
 });
@@ -124,7 +129,7 @@ app.post("/urls", (req, res) => {
 // GET route for login page
 app.get("/login", (req, res) => {
   let templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session["user_id"]]
   };
   res.render("login", templateVars);
 });
@@ -155,7 +160,7 @@ app.post("/login", (req, res) => {
     console.log(hashedPassword);
     if (bcrypt.compareSync(req.body.password, users[matchedUserId].hashedPassword)) {
       console.log("Password matches");
-      res.cookie("user_id", matchedUserId);
+      req.session.user_id = matchedUserId;
       res.redirect('/urls');
     } else { // If the passwords don't match, 403
       console.log("Passwords don't match");
@@ -171,8 +176,8 @@ app.post("/urls/:id/delete", (req, res) => {
   console.log("User who created the link: ");
   console.log(urlDatabase[req.params.id].userID); // userID who created the link
   console.log("User attempting to delete the link: ");
-  console.log(users[req.cookies["user_id"]].id); // userID trying to delete
-  if (urlDatabase[req.params.id].userID === users[req.cookies["user_id"]].id) {
+  console.log(users[req.session["user_id"]].id); // userID trying to delete
+  if (urlDatabase[req.params.id].userID === users[req.session["user_id"]].id) {
     // Delete the URL from our urlDatabase object using its id as the key
     delete urlDatabase[req.params.id];
   }
@@ -197,13 +202,13 @@ app.post("/urls/:id", (req, res) => {
 });
 // POST route to logout and remove the user's cookie
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id", req.body.email);
+  req.session = null;
   res.redirect("/urls");
 });
 // GET route to /register to show registration form
 app.get("/register", (req, res) => {
   let templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   };
   res.render("register", templateVars);
 });
@@ -229,7 +234,7 @@ app.post("/register", (req, res) => {
       email: req.body.email,
       hashedPassword: bcrypt.hashSync(req.body.password, 10)
     }
-    res.cookie("user_id", newRandomString);
+    req.session.user_id = newRandomString;
     console.log("users object in POST /register before redirect to /urls: ")
     console.log(users); // debug statement
     res.redirect("/urls");

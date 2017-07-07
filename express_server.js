@@ -61,30 +61,16 @@ app.get("/hello", (req, res) => {
 });
 // Show urls_index at /urls
 app.get("/urls", (req, res) => {
-  console.log("req.session.user_id: ");
-  console.log(req.session.user_id);
   let urlsToDisplay = {};
   if (req.session.user_id === undefined) {
     urlsToDisplay = {};
   } else {
     urlsToDisplay = urlsForUser(req.session.user_id);
   }
-  console.log("Urls to Display: ");
-  console.log(urlsToDisplay);
   let templateVars = {
     urls: urlsToDisplay,
     user: users[req.session.user_id]
   };
-  //console.log("Contents of req.cookies in GET /urls: ");
-  //console.log(req.cookies);
-  console.log("Contents of templateVars");
-  console.log(templateVars.user);
-  //console.log("templateVars at GET /urls:")
-  //console.log(templateVars);
-  //console.log("user variable: ");
-  //console.log(templateVars.user);
-  //console.log("Output of urlsForUser in GET /urls: ")
-  //urlsForUser(users[req.cookies["user_id"]].id);
   res.render("urls_index", templateVars);
 });
 // Create new URL page urls_new at /urls/new
@@ -93,8 +79,6 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.session["user_id"]]
   };
-  console.log("templateVars in GET route to /urls/new: ");
-  console.log(templateVars);
   if (users[req.session["user_id"]] !== undefined) {
     res.render("urls_new", templateVars);
   } else {
@@ -118,16 +102,12 @@ app.get("/urls/:id", (req, res) => {
 });
 // POST route for new URLs being shortened
 app.post("/urls", (req, res) => {
-  console.log("req.body for POST route to /urls: ");
-  console.log(req.body);  // debug statement to see POST parameters
   let newRandomString = generateRandomString();
   urlDatabase[newRandomString] = {
     id: newRandomString,
     userID: req.body.userID,
     url: req.body.longURL
   };
-  console.log("urlDatabase in POST route to /urls: ");
-  console.log(urlDatabase);
   // Respond with a redirect to /urls/newRandomString
   res.redirect("/urls/" + newRandomString);
 });
@@ -150,7 +130,6 @@ app.post("/login", (req, res) => {
   }
   // If the submitted email is not in the array, 403
   if (existingEmails.indexOf(req.body.email) === -1) {
-    console.log("Email doesn't exist in database");
     res.status(403).send({ error: "Invalid email address or password" });
   } else { // If the submitted is in the array, get the ID associated with it
     for (let userId in users) {
@@ -162,26 +141,16 @@ app.post("/login", (req, res) => {
     }
     // Check the matched ID hashed password against the submitted password that we will hash here. If the passwords match, redirected to /urls and set cookie
     let hashedPassword = bcrypt.hashSync(req.body.password, 10);
-    console.log(hashedPassword);
-    if (bcrypt.compareSync(req.body.password, users[matchedUserId].hashedPassword)) {
-      console.log("Password matches");
+    if (bcrypt.compareSync(req.body.password, users[matchedUserId].hashedPassword)) { // If the passwords match, set the user_id and redirect to /urls
       req.session.user_id = matchedUserId;
       res.redirect("/urls");
     } else { // If the passwords don't match, 403
-      console.log("Passwords don't match");
       res.status(403).send({ error: "Invalid email address or password" });
     }
   }
 });
 // POST route for deleting existing shortened URLs
 app.post("/urls/:id/delete", (req, res) => {
-  console.log("req.params of delete request: ");
-  console.log(req.params);
-  console.log(urlDatabase[req.params.id]);
-  console.log("User who created the link: ");
-  console.log(urlDatabase[req.params.id].userID); // userID who created the link
-  console.log("User attempting to delete the link: ");
-  console.log(users[req.session["user_id"]].id); // userID trying to delete
   if (urlDatabase[req.params.id].userID === users[req.session["user_id"]].id) {
     // Delete the URL from our urlDatabase object using its id as the key
     delete urlDatabase[req.params.id];
@@ -191,14 +160,8 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 // POST route to change an existing shortened URL
 app.post("/urls/:id", (req, res) => {
-  console.log("req.body in POST route to change a URL: ");
-  console.log(req.body); // debug statement to see POST parameters
   let fullURL = req.body.newLongURL;
   let shortURL = req.body.shortURL;
-  console.log("req.body.userID: ");
-  console.log(req.body.userID);
-  console.log("urlDatabase[shortURL].userID: ")
-  console.log(urlDatabase[shortURL].userID);
   if (req.body.userID === urlDatabase[shortURL].userID) {
     urlDatabase[shortURL].url = fullURL;
   }
@@ -219,8 +182,6 @@ app.get("/register", (req, res) => {
 });
 // POST route to /register to show registration form
 app.post("/register", (req, res) => {
-  console.log("Contents of req.body in POST to /register route: ")
-  console.log(req.body);  // debug statement to see POST parameters
   for (let userId in users) {
     if (users.hasOwnProperty(userId)) {
       if (req.body.email === users[userId].email) {
@@ -240,8 +201,6 @@ app.post("/register", (req, res) => {
       hashedPassword: bcrypt.hashSync(req.body.password, 10)
     }
     req.session.user_id = newRandomString;
-    console.log("users object in POST /register before redirect to /urls: ")
-    console.log(users); // debug statement
     res.redirect("/urls");
   };
 });

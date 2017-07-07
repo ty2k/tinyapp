@@ -47,17 +47,16 @@ const users = {
   }
 };
 
-// Hello at root
+// Upon GET request to /, direct unauthenticated users to /login, authenticated users to /urls
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  if (req.session.user_id === undefined) {
+    res.redirect("/login");
+  }
+  res.redirect("/urls");
 });
 // Show our JSON object at /urls.json
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-});
-// Hello world at /hello
-app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 // Show urls_index at /urls
 app.get("/urls", (req, res) => {

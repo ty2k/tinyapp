@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 8080;
 let cookieSession = require("cookie-session");
 app.use(cookieSession({
   name: "session",
-  keys: [ "key1", "key2" ],
+  keys: [ "anexamplekey", "anotherexamplekey" ],
   maxAge: 24 * 60 * 60 * 1000
 }));
 app.use(bodyParser.urlencoded({extended: true}));

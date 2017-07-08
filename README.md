@@ -27,6 +27,11 @@ There is no logic to check the validity of URLs being entered by users, so URLs 
 - "ejs": "^2.5.6",
 - "express": "^4.15.3"
 
+## Screenshots
+
+URLs index for authenticated user
+![TinyApp URLs index page for authenticated user](https://raw.githubusercontent.com/ty2k/tinyapp/master/docs/Screenshot-TinyApp-login-page.png)
+
 ## Contact Author
 
 [Tyler Krys](https://tylerkrys.ca) made this to learn about web development.

@@ -119,10 +119,15 @@ app.post("/urls", (req, res) => {
 });
 // GET route for login page
 app.get("/login", (req, res) => {
-  let templateVars = {
-    user: users[req.session["user_id"]]
-  };
-  res.render("login", templateVars);
+  // If there is already a user logged in, redirect to /urls
+  if (req.session["user_id"] !== undefined) {
+    res.redirect("/urls");
+  } else { // Else display the login form
+      let templateVars = {
+        user: users[req.session["user_id"]]
+      };
+    res.render("login", templateVars);
+  }
 });
 // POST route for logging in and becoming cookied
 app.post("/login", (req, res) => {
@@ -158,11 +163,12 @@ app.post("/login", (req, res) => {
 // POST route for deleting existing shortened URLs
 app.post("/urls/:id/delete", (req, res) => {
   if (urlDatabase[req.params.id].userID === users[req.session["user_id"]].id) {
-    // Delete the URL from our urlDatabase object using its id as the key
+    // Delete the URL from our urlDatabase and redirect to /urls
     delete urlDatabase[req.params.id];
+    res.redirect("/urls");
+  } else {
+    res.end("<html><head><title>TinyApp: Error</title></head><body>I'm not sure what you're doing here, but please stop trying to delete things you don't own! Please <a href='/register'>register</a> or <a href='/login'>login</a>.</body></html>\n");
   }
-  // Redirect back to the urls index page
-  res.redirect("/urls");
 });
 // POST route to change an existing shortened URL
 app.post("/urls/:id", (req, res) => {

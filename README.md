@@ -29,6 +29,9 @@ There is no logic to check the validity of URLs being entered by users, so URLs 
 
 ## Screenshots
 
+Login page
+![TinyApp login page](https://raw.githubusercontent.com/ty2k/tinyapp/master/docs/Screenshot-TinyApp-login-page.png)
+
 URLs index for authenticated user
 ![TinyApp URLs index page for authenticated user](https://raw.githubusercontent.com/ty2k/tinyapp/master/docs/Screenshot-TinyApp-login-page.png)
 

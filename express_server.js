@@ -1,23 +1,24 @@
-"use strict";
+///////////////////////////////////////
+//  Express server and requirements
+///////////////////////////////////////
 
 const express = require("express");
-var cookieSession = require("cookie-session");
 const app = express();
+const bcrypt = require("bcrypt");
+const bodyParser = require("body-parser");
+const PORT = process.env.PORT || 8080;
+let cookieSession = require("cookie-session");
 app.use(cookieSession({
   name: "session",
   keys: [ "key1", "key2" ],
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
-const PORT = process.env.PORT || 8080; // default port 8080
-
-const bcrypt = require("bcrypt");
-
-app.set("view engine", "ejs")
-
-// Require body-parser
-const bodyParser = require("body-parser");
+  maxAge: 24 * 60 * 60 * 1000
+}));
 app.use(bodyParser.urlencoded({extended: true}));
+app.set("view engine", "ejs");
+
+///////////////////////////////////////
+//  URL and User database objects
+///////////////////////////////////////
 
 // Instead of an actual URL database, use a dummy database object for now
 const urlDatabase = {
@@ -38,32 +39,61 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    hashedPassword: "$2a$10$.h4h.MdXZ1dvfD1irSpW/eBFnw7W8zJ.hnwuRESc/CEl0f7N3drva",
+    hashedPassword: "$2a$10$.h4h.MdXZ1dvfD1irSpW/eBFnw7W8zJ.hnwuRESc/CEl0f7N3drva"
   },
- "user2RandomID": {
+  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
     hashedPassword: "$2a$10$RJtBCOtiQCZ4Mdh127m9GuRJkpnLs9Em6khLeBRuFDWPWbyUjFarS"
   }
 };
 
-// Upon GET request to /, direct unauthenticated users to /login, authenticated users to /urls
-app.get("/", (req, res) => {
-  if (req.session.user_id === undefined) {
-    res.redirect("/login");
+///////////////////////////////////////
+//  Functions
+///////////////////////////////////////
+
+// Using the user's id, create an object of links they have made
+function urlsForUser(id) {
+  let urlsBelongingToUser = {};
+  for (let urlID in urlDatabase) {
+    if (urlDatabase.hasOwnProperty(urlID)) {
+      if (urlDatabase[urlID].userID === id) {
+        urlsBelongingToUser[urlID] = urlDatabase[urlID];
+      }
+    }
   }
-  res.redirect("/urls");
-});
-// Show our JSON object at /urls.json
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  return urlsBelongingToUser;
+}
+
+// Random string generator to create unique-ish keys for users and URLs
+function generateRandomString() {
+  let randomString = "";
+  const alphaNums = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < 6; i++) {
+    randomString += alphaNums.charAt(Math.floor(Math.random() * alphaNums.length));
+  }
+  return randomString;
+}
+
+///////////////////////////////////////
+//  Routes - GET
+///////////////////////////////////////
+
+app.get("/", (req, res) => {
+  // If user is not authenticated, redirect to /login
+  if (req.session.user_id === undefined) {
+    return res.redirect("/login");
+  // Else go to the index of shortened URLs
+  } else {
+    res.redirect("/urls");
+  }
 });
 // Show urls_index at /urls
 app.get("/urls", (req, res) => {
+  // Create an empty urls object to pass to non-authenticated users
   let urlsToDisplay = {};
-  if (req.session.user_id === undefined) {
-    urlsToDisplay = {};
-  } else {
+  // If a user is authenticated, show them the urls they have created
+  if (req.session.user_id !== undefined) {
     urlsToDisplay = urlsForUser(req.session.user_id);
   }
   let templateVars = {
@@ -78,15 +108,16 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.session["user_id"]]
   };
+  // If a user is authenticated, send them to the new URL page
   if (users[req.session["user_id"]] !== undefined) {
-    res.render("urls_new", templateVars);
+    return res.render("urls_new", templateVars);
+  // Else, send non-authenticated users to /login
   } else {
     res.redirect("/login");
   }
 });
-// GET route to urls_show in form urls/:id
+// GET route to urls_show view (page to edit a URL's details)
 app.get("/urls/:id", (req, res) => {
-  let fullURL = "";
   // If the requested URL isn't in our database, set templateVars as such
   if (urlDatabase[req.params.id] === undefined) {
     let templateVars = {
@@ -95,8 +126,9 @@ app.get("/urls/:id", (req, res) => {
       urlUserID: undefined,
       user: users[req.session["user_id"]]
     };
-    res.render("urls_show", templateVars);
-  } else { // Else if the URL is in our database, set the templateVars correctly
+    return res.render("urls_show", templateVars);
+  // Else if the URL is in our database, set the templateVars with its data
+  } else {
     let templateVars = {
       shortURL: req.params.id,
       fullURL: urlDatabase[req.params.id].url,
@@ -106,29 +138,51 @@ app.get("/urls/:id", (req, res) => {
     res.render("urls_show", templateVars);
   }
 });
-// POST route for new URLs being shortened
-app.post("/urls", (req, res) => {
-  let newRandomString = generateRandomString();
-  urlDatabase[newRandomString] = {
-    id: newRandomString,
-    userID: req.body.userID,
-    url: req.body.longURL
-  };
-  // Respond with a redirect to /urls/newRandomString
-  res.redirect("/urls/" + newRandomString);
-});
 // GET route for login page
 app.get("/login", (req, res) => {
   // If there is already a user logged in, redirect to /urls
   if (req.session["user_id"] !== undefined) {
-    res.redirect("/urls");
-  } else { // Else display the login form
-      let templateVars = {
-        user: users[req.session["user_id"]]
-      };
+    return res.redirect("/urls");
+  // Else display the login form
+  } else {
+    let templateVars = {
+      user: users[req.session["user_id"]]
+    };
     res.render("login", templateVars);
   }
 });
+// GET route to /register to show registration form
+app.get("/register", (req, res) => {
+  // If there is already a user logged in, redirect to /urls
+  if (req.session["user_id"] !== undefined) {
+    return res.redirect("/urls");
+  // Else display the login form
+  } else {
+    let templateVars = {
+      user: users[req.session.user_id]
+    };
+    res.render("register", templateVars);
+  }
+});
+// GET route for redirection out
+app.get("/u/:shortURL", (req, res) => {
+  // If the shortURL is invalid, display an error page
+  if (urlDatabase[req.params.shortURL] === undefined) {
+    let templateVars = {
+      user: users[req.session.user_id]
+    };
+    return res.render("urls_invalid", templateVars);
+  // Otherwise direct to the long URL
+  } else {
+    let longURL = urlDatabase[req.params.shortURL].url;
+    res.redirect(longURL);
+  }
+});
+
+///////////////////////////////////////
+//  Routes - POST
+///////////////////////////////////////
+
 // POST route for logging in and becoming cookied
 app.post("/login", (req, res) => {
   let existingEmails = [];
@@ -139,10 +193,11 @@ app.post("/login", (req, res) => {
       existingEmails.push(users[userId].email);
     }
   }
-  // If the submitted email is not in the array, 403
+  // If the submitted email is not in the array, error
   if (existingEmails.indexOf(req.body.email) === -1) {
-    res.status(403).send({ error: "Invalid email address or password" });
-  } else { // If the submitted is in the array, get the ID associated with it
+    return res.end("<html><head><title>TinyApp: Error</title></head><body>Invalid username or password. <a href='/register'>Register</a> or <a href='/login'>login</a>.</body></html>\n");
+  // Else if the email is in the array, get the ID associated with it and compare the password hashes
+  } else {
     for (let userId in users) {
       if (users.hasOwnProperty(userId)) {
         if (users[userId].email === req.body.email) {
@@ -150,114 +205,98 @@ app.post("/login", (req, res) => {
         }
       }
     }
-    // Check the matched ID hashed password against the submitted password that we will hash here. If the passwords match, redirected to /urls and set cookie
+    // Check the matched ID hashed password against the submitted password that we will hash here
     let hashedPassword = bcrypt.hashSync(req.body.password, 10);
-    if (bcrypt.compareSync(req.body.password, users[matchedUserId].hashedPassword)) { // If the passwords match, set the user_id and redirect to /urls
+    // If the passwords match, set the user_id cookie and redirect to /urls
+    if (bcrypt.compareSync(req.body.password, users[matchedUserId].hashedPassword)) {
       req.session.user_id = matchedUserId;
-      res.redirect("/urls");
-    } else { // If the passwords don't match, 403
-      res.status(403).send({ error: "Invalid email address or password" });
+      return res.redirect("/urls");
+    // If the passwords don't match, error
+    } else {
+      res.end("<html><head><title>TinyApp: Error</title></head><body>Invalid username or password. <a href='/register'>Register</a> or <a href='/login'>login</a>.</body></html>\n");
     }
   }
 });
-// POST route for deleting existing shortened URLs
-app.post("/urls/:id/delete", (req, res) => {
-  if (urlDatabase[req.params.id].userID === users[req.session["user_id"]].id) {
-    // Delete the URL from our urlDatabase and redirect to /urls
-    delete urlDatabase[req.params.id];
-    res.redirect("/urls");
-  } else {
-    res.end("<html><head><title>TinyApp: Error</title></head><body>I'm not sure what you're doing here, but please stop trying to delete things you don't own! Please <a href='/register'>register</a> or <a href='/login'>login</a>.</body></html>\n");
-  }
-});
-// POST route to change an existing shortened URL
-app.post("/urls/:id", (req, res) => {
-  let fullURL = req.body.newLongURL;
-  let shortURL = req.body.shortURL;
-  if (req.body.userID === urlDatabase[shortURL].userID) {
-    urlDatabase[shortURL].url = fullURL;
-  }
-  // Redirect back to the urls index page
-  res.redirect("/urls");
-});
-// POST route to logout and remove the user's cookie
-app.post("/logout", (req, res) => {
-  req.session = null;
-  res.redirect("/urls");
-});
-// GET route to /register to show registration form
-app.get("/register", (req, res) => {
-  // If there is already a user logged in, redirect to /urls
-  if (req.session["user_id"] !== undefined) {
-    res.redirect("/urls");
-  } else { // Else display the login form
-    let templateVars = {
-    user: users[req.session.user_id]
-      };
-    res.render("register", templateVars);
-  }
-});
-// POST route to /register to show registration form
+// POST route to /register to attempt creation of new user
 app.post("/register", (req, res) => {
   for (let userId in users) {
     if (users.hasOwnProperty(userId)) {
+      // If user exists, error
       if (req.body.email === users[userId].email) {
-        res.status(400).send({ error: "Email address already in database" });
+        return res.end("<html><head><title>TinyApp: Error</title></head><body>Email address already in database. <a href='/register'>Register</a> or <a href='/login'>login</a>.</body></html>\n");
       }
     }
   }
+  // If email field is empty, error
   if (req.body.email === "") {
-    res.status(400).send({ error: "Need an email address" });
+    return res.end("<html><head><title>TinyApp: Error</title></head><body>Missing email address from registration form. <a href='/register'>Register</a> or <a href='/login'>login</a>.</body></html>\n");
+  // If password field is empty, error
   } else if (req.body.password === "") {
-    res.status(400).send({ error: "Need a password" });
+    return res.end("<html><head><title>TinyApp: Error</title></head><body>Missing password from registration form. <a href='/register'>Register</a> or <a href='/login'>login</a>.</body></html>\n");
+  // If user doesn't exist yet, email and password are present, create new user
   } else {
     let newRandomString = generateRandomString();
     users[newRandomString] = {
       id: newRandomString,
       email: req.body.email,
       hashedPassword: bcrypt.hashSync(req.body.password, 10)
-    }
-    req.session.user_id = newRandomString;
-    res.redirect("/urls");
-  };
-});
-// Our actual URL redirection GET route
-app.get("/u/:shortURL", (req, res) => {
-  // If the shortURL is invalid, display an error page
-  if (urlDatabase[req.params.shortURL] === undefined) {
-    let templateVars = {
-      user: users[req.session.user_id]
     };
-    res.render("urls_invalid", templateVars);
-  } else { // Otherwise direct to the long URL
-    let longURL = urlDatabase[req.params.shortURL].url;
-    res.redirect(longURL);
+    req.session.user_id = newRandomString;
+    // Redirect to /urls after creating new user and session
+    res.redirect("/urls");
   }
 });
+// POST route for new URLs being shortened
+app.post("/urls", (req, res) => {
+  // If our user is authenticated, let me make a new short URL
+  if (req.session["user_id"] !== undefined) {
+    let newRandomString = generateRandomString();
+    urlDatabase[newRandomString] = {
+      id: newRandomString,
+      userID: req.body.userID,
+      url: req.body.longURL
+    };
+    // Redirect to page where user can edit the URL's details (GET /urls/:id)
+    return res.redirect("/urls/" + newRandomString);
+  // Else throw an error asking the user to register or log in.
+  } else {
+    res.end("<html><head><title>TinyApp: Error</title></head><body>Unfortunately, you can't make a new short URL unless you are logged in. <a href='/register'>Register</a> or <a href='/login'>login</a>.</body></html>\n");
+  }
+});
+// POST route to change an existing shortened URL
+app.post("/urls/:id", (req, res) => {
+  // If our user is authenticated and owns the URL, let them update it
+  if (req.session["user_id"] !== undefined && req.session["user_id"] === urlDatabase[req.body.shortURL].userID) {
+    let fullURL = req.body.newLongURL;
+    let shortURL = req.body.shortURL;
+    urlDatabase[req.body.shortURL].url = req.body.newLongURL;
+    // Redirect back to the urls index page
+    return res.redirect("/urls");
+  } else {
+    res.end("<html><head><title>TinyApp: Error</title></head><body>Unfortunately, you can only change URLs you created. <a href='/register'>Register</a> or <a href='/login'>login</a>.</body></html>\n");
+  }
+});
+// POST route for deleting existing shortened URLs
+app.post("/urls/:id/delete", (req, res) => {
+  // If user is authenticated and created the link, delete URL and return to /urls
+  if (urlDatabase[req.params.id].userID === users[req.session["user_id"]].id) {
+    delete urlDatabase[req.params.id];
+    return res.redirect("/urls");
+  // Else, error
+  } else {
+    res.end("<html><head><title>TinyApp: Error</title></head><body>I'm not sure what you're doing here, but please stop trying to delete things you don't own! Please <a href='/register'>register</a> or <a href='/login'>login</a>.</body></html>\n");
+  }
+});
+// POST route to logout and remove the user's cookie
+app.post("/logout", (req, res) => {
+  req.session = null;
+  res.redirect("/urls");
+});
 
-// Persistent listener after all routes have been defined
+///////////////////////////////////////
+//  Persistent listener
+///////////////////////////////////////
+
 app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}!`);
 });
-
-// Random string generator to create unique-ish keys for urlDatabase
-function generateRandomString() {
-  let randomString= "";
-  const alphaNums = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < 6; i++)
-    randomString += alphaNums.charAt(Math.floor(Math.random() * alphaNums.length));
-  return randomString;
-}
-
-// Take the user's id and spit out an object that contains the links they own
-function urlsForUser(id) {
-  let urlsBelongingToUser = {};
-  for (let urlID in urlDatabase) {
-    if (urlDatabase.hasOwnProperty(urlID)) {
-      if (urlDatabase[urlID].userID === id) {
-        urlsBelongingToUser[urlID] = urlDatabase[urlID];
-      }
-    }
-  }
-  return urlsBelongingToUser;
-}

@@ -33,7 +33,7 @@ Login page
 ![TinyApp login page](https://raw.githubusercontent.com/ty2k/tinyapp/master/docs/Screenshot-TinyApp-login-page.png)
 
 URLs index for authenticated user
-![TinyApp URLs index page for authenticated user](https://raw.githubusercontent.com/ty2k/tinyapp/master/docs/Screenshot-TinyApp-login-page.png)
+![TinyApp URLs index page for authenticated user](https://raw.githubusercontent.com/ty2k/tinyapp/master/docs/Screenshot-TinyApp-shortened-URLs-index.png)
 
 ## Contact Author
 

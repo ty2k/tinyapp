@@ -187,10 +187,15 @@ app.post("/logout", (req, res) => {
 });
 // GET route to /register to show registration form
 app.get("/register", (req, res) => {
-  let templateVars = {
+  // If there is already a user logged in, redirect to /urls
+  if (req.session["user_id"] !== undefined) {
+    res.redirect("/urls");
+  } else { // Else display the login form
+    let templateVars = {
     user: users[req.session.user_id]
-  };
-  res.render("register", templateVars);
+      };
+    res.render("register", templateVars);
+  }
 });
 // POST route to /register to show registration form
 app.post("/register", (req, res) => {

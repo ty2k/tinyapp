@@ -81,7 +81,7 @@ function generateRandomString() {
 
 app.get("/", (req, res) => {
   // If user is not authenticated, redirect to /login
-  if (req.session.user_id === undefined) {
+  if (!req.session.user_id) {
     return res.redirect("/login");
   // Else go to the index of shortened URLs
   } else {
@@ -93,7 +93,7 @@ app.get("/urls", (req, res) => {
   // Create an empty urls object to pass to non-authenticated users
   let urlsToDisplay = {};
   // If a user is authenticated, show them the urls they have created
-  if (req.session.user_id !== undefined) {
+  if (req.session.user_id) {
     urlsToDisplay = urlsForUser(req.session.user_id);
   }
   let templateVars = {
@@ -109,7 +109,7 @@ app.get("/urls/new", (req, res) => {
     user: users[req.session["user_id"]]
   };
   // If a user is authenticated, send them to the new URL page
-  if (users[req.session["user_id"]] !== undefined) {
+  if (users[req.session["user_id"]]) {
     return res.render("urls_new", templateVars);
   // Else, send non-authenticated users to /login
   } else {
@@ -119,7 +119,7 @@ app.get("/urls/new", (req, res) => {
 // GET route to urls_show view (page to edit a URL's details)
 app.get("/urls/:id", (req, res) => {
   // If the requested URL isn't in our database, set templateVars as such
-  if (urlDatabase[req.params.id] === undefined) {
+  if (!urlDatabase[req.params.id]) {
     let templateVars = {
       shortURL: req.params.id,
       fullURL: undefined,
@@ -141,7 +141,7 @@ app.get("/urls/:id", (req, res) => {
 // GET route for login page
 app.get("/login", (req, res) => {
   // If there is already a user logged in, redirect to /urls
-  if (req.session["user_id"] !== undefined) {
+  if (req.session["user_id"]) {
     return res.redirect("/urls");
   // Else display the login form
   } else {
@@ -154,7 +154,7 @@ app.get("/login", (req, res) => {
 // GET route to /register to show registration form
 app.get("/register", (req, res) => {
   // If there is already a user logged in, redirect to /urls
-  if (req.session["user_id"] !== undefined) {
+  if (req.session["user_id"]) {
     return res.redirect("/urls");
   // Else display the login form
   } else {
@@ -167,7 +167,7 @@ app.get("/register", (req, res) => {
 // GET route for redirection out
 app.get("/u/:shortURL", (req, res) => {
   // If the shortURL is invalid, display an error page
-  if (urlDatabase[req.params.shortURL] === undefined) {
+  if (!urlDatabase[req.params.shortURL]) {
     let templateVars = {
       user: users[req.session.user_id]
     };
@@ -249,7 +249,7 @@ app.post("/register", (req, res) => {
 // POST route for new URLs being shortened
 app.post("/urls", (req, res) => {
   // If our user is authenticated, let me make a new short URL
-  if (req.session["user_id"] !== undefined) {
+  if (req.session["user_id"]) {
     let newRandomString = generateRandomString();
     urlDatabase[newRandomString] = {
       id: newRandomString,
@@ -266,7 +266,7 @@ app.post("/urls", (req, res) => {
 // POST route to change an existing shortened URL
 app.post("/urls/:id", (req, res) => {
   // If our user is authenticated and owns the URL, let them update it
-  if (req.session["user_id"] !== undefined && req.session["user_id"] === urlDatabase[req.body.shortURL].userID) {
+  if (req.session["user_id"] && req.session["user_id"] === urlDatabase[req.body.shortURL].userID) {
     let fullURL = req.body.newLongURL;
     let shortURL = req.body.shortURL;
     urlDatabase[req.body.shortURL].url = req.body.newLongURL;

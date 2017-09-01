@@ -6,13 +6,13 @@
   <body>
     <% include partials/_header.ejs %>
     <h2>Login</h2>
-    <form action="/login" method="POST">
+    <form action="/user/login" method="POST">
       <label for="email">Email:</label>
       <input id="email" type="email" name="email" placeholder="user@domain.com">
       <label for="password">Password:</label>
       <input id="password" type="password" name="password" placeholder="********">
       <input type="submit" value="Submit">
     </form>
-    <p>Or <a href="/register">register</a> an account if this is your first time.</p>
+    <p>Or <a href="/user/register">register</a> an account if this is your first time.</p>
   </body>
 </html>

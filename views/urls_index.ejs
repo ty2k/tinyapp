@@ -7,7 +7,7 @@
     <% include partials/_header.ejs %>
     <!--If not logged in, display nothing but header -->
     <% if (user === undefined) { %>
-      <p>This URL shortening service requires registration to shorten new URLs. If you were to <a href="/register">register</a> or <a href="/login">login</a>, this page would be a <strong>lot</strong> more interesting.
+      <p>This URL shortening service requires registration to shorten new URLs. If you were to <a href="/user/register">register</a> or <a href="/user/login">login</a>, this page would be a <strong>lot</strong> more interesting.
       <% } else { %> <!-- If logged in, display the index,-->
     <h2>Shortened URLs Index</h2>
     <ul>

@@ -11,7 +11,7 @@
     <!-- If a user is not logged in, show them the way to register or login -->
       <p>This page is used to edit the details of a shortened URL, and you need to be logged in to use it.</p>
       <p>You can still see <a href="/u/<%= shortURL %>">use the short link</a> (it goes to <a href="<%= fullURL %>"><%= fullURL %></a>), but you can't edit it.</p>
-      <p>If you were to <a href="/register">register</a> or <a href="/login">login</a>, this page would be a <strong>lot</strong> more interesting.
+      <p>If you were to <a href="/user/register">register</a> or <a href="/user/login">login</a>, this page would be a <strong>lot</strong> more interesting.
     <% } else if (urlUserID !== user.id ) { %> <!-- If a user is logged in, but doesn't own this URL, they can see where it goes or make their own -->
       <p>It looks like this link doesn't belong to you.</p>
       <p>You can still see <a href="/u/<%= shortURL %>">use the short link</a> (it goes to <a href="<%= fullURL %>"><%= fullURL %></a>), but you can't edit it.</p>

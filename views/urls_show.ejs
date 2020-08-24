@@ -4,7 +4,7 @@
     <title>TinyApp: Shortened URL Details</title>
   </head>
   <body>
-    <% include partials/_header.ejs %>
+    <%- include('partials/_header.ejs') %>
     <% if (fullURL === undefined) { %>
       <p>That's not a valid URL. Why not <a href="/urls/new">make your own shortened URL</a> or <a href="/urls/">view the ones you have shortened already</a>?</p>
     <% } else if (user === undefined) { %>

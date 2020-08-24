@@ -4,7 +4,7 @@
     <title>TinyApp: URLs Index</title>
   </head>
   <body>
-    <% include partials/_header.ejs %>
+    <%- include('partials/_header.ejs') %>
     <!--If not logged in, display nothing but header -->
     <% if (user === undefined) { %>
       <p>This URL shortening service requires registration to shorten new URLs. If you were to <a href="/user/register">register</a> or <a href="/user/login">login</a>, this page would be a <strong>lot</strong> more interesting.

@@ -4,7 +4,7 @@
     <title>TinyApp: Shorten a New URL</title>
   </head>
   <body>
-    <% include partials/_header %>
+    <%- include('partials/_header.ejs') %>
     <h2>Shorten a New URL</h2>
     <form action="/urls" method="POST">
       <label for="longURL">Enter a URL:</label>

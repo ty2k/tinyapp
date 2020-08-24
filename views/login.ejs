@@ -4,7 +4,7 @@
     <title>TinyApp: Login</title>
   </head>
   <body>
-    <% include partials/_header.ejs %>
+    <%- include('partials/_header.ejs') %>
     <h2>Login</h2>
     <form action="/user/login" method="POST">
       <label for="email">Email:</label>

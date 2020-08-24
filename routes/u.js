@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const users = require("../db/users");
 const urlDatabase = require("../db/urls");
 
@@ -12,7 +11,7 @@ router.get("/:shortURL", (req, res) => {
       user: users[req.session.user_id]
     };
     return res.render("urls_invalid", templateVars);
-  // Otherwise direct to the long URL
+    // Otherwise direct to the long URL
   } else {
     let longURL = urlDatabase[req.params.shortURL].url;
     res.redirect(longURL);

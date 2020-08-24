@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const getRandomString = require("../utils/random-string").generateRandomString;
 const getUrlsForUser = require("../utils/urls-for-user").urlsForUser;
 const users = require("../db/users");
@@ -30,7 +29,7 @@ router.get("/new", (req, res) => {
   // If a user is authenticated, send them to the new URL page
   if (users[req.session["user_id"]]) {
     return res.render("urls_new", templateVars);
-  // Else, send non-authenticated users to /login
+    // Else, send non-authenticated users to /login
   } else {
     res.redirect("/login");
   }
@@ -47,7 +46,7 @@ router.get("/:id", (req, res) => {
       user: users[req.session["user_id"]]
     };
     return res.render("urls_show", templateVars);
-  // Else if the URL is in our database, set the templateVars with its data
+    // Else if the URL is in our database, set the templateVars with its data
   } else {
     let templateVars = {
       shortURL: req.params.id,
@@ -71,7 +70,7 @@ router.post("/", (req, res) => {
     };
     // Redirect to page where user can edit the URL's details (GET /urls/:id)
     return res.redirect("/urls/" + newRandomString);
-  // Else throw an error asking the user to register or log in.
+    // Else throw an error asking the user to register or log in.
   } else {
     res.end("<html><head><title>TinyApp: Error</title></head><body>Unfortunately, you can't make a new short URL unless you are logged in. <a href='/register'>Register</a> or <a href='/login'>login</a>.</body></html>\n");
   }
@@ -97,7 +96,7 @@ router.post("/:id/delete", (req, res) => {
   if (urlDatabase[req.params.id].userID === users[req.session["user_id"]].id) {
     delete urlDatabase[req.params.id];
     return res.redirect("/urls");
-  // Else, error
+    // Else, error
   } else {
     res.end("<html><head><title>TinyApp: Error</title></head><body>I'm not sure what you're doing here, but please stop trying to delete things you don't own! Please <a href='/register'>register</a> or <a href='/login'>login</a>.</body></html>\n");
   }
